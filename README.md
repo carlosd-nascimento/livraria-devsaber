@@ -24,10 +24,18 @@ O projeto original foi desenvolvido em equipe utilizando o **Google BigQuery**. 
 ```
 livraria-devsaber/
 │
-├── setup_database.sql       # Criação do banco de dados e tabelas
-├── seed_data.sql            # Inserção dos dados de exemplo
-├── queries_and_views.sql    # Consultas analíticas e criação de Views
-├── projeto_original_BigQuery.sql  # Versão original desenvolvida no BigQuery
+├── querys/
+│   ├── analise_vendas_vendedor.png     # Resultado: total de vendas por vendedor
+│   ├── livros_mais_vendidos.png        # Resultado: livros mais vendidos
+│   ├── gastos_cliente.png              # Resultado: clientes que mais gastaram
+│   └── detalhes_vendas.png             # Resultado: detalhes completos das vendas
+│
+├── archive/                            # Arquivos de referência e versão original
+│
+├── queries_and_views.sql               # Consultas analíticas e criação de Views
+├── setup_database.sql                  # Criação do banco de dados e tabelas
+├── seed_data.sql                       # Inserção dos dados de exemplo
+├── tabelas.png                         # Diagrama do banco de dados (MySQL Workbench)
 └── README.md
 ```
 
@@ -37,11 +45,9 @@ livraria-devsaber/
 
 O banco de dados `livraria_devsaber` é composto por **4 tabelas** relacionadas entre si:
 
-```
-produtos ──────┐
-               ├──► vendas ◄── clientes
-vendedores ────┘
-```
+
+![Livros Mais Vendidos](./tabelas.png)
+
 
 ### Tabelas
 
@@ -87,87 +93,28 @@ vendedores ────┘
 ### 1. Total de Vendas por Vendedor
 Ranking dos vendedores pelo valor total gerado em vendas.
 
-```sql
-SELECT v.nome_vendedor,
-    SUM(venda.valor_total) AS total_vendas
-FROM livraria_devsaber.vendas AS venda
-JOIN livraria_devsaber.vendedores AS v
-    ON venda.vendedor_id = v.vendedor_id
-GROUP BY v.nome_vendedor
-ORDER BY total_vendas DESC;
-```
-
-**Resultado:**
-| nome_vendedor | total_vendas |
-|---|---|
-| João Santos | 282.60 |
-| Maria Oliveira | 248.48 |
-| Lucas Rocha | 192.46 |
-| Pedro Lima | 79.80 |
+![Total de Vendas por Vendedor](./querys/analise_vendas_vendedor.png)
 
 ---
 
 ### 2. Livros Mais Vendidos
 Lista os livros ordenados pela quantidade de unidades vendidas.
 
-```sql
-SELECT livro.titulo, livro.autor,
-    SUM(venda.quantidade) AS total_unidades_vendidas
-FROM livraria_devsaber.vendas AS venda
-JOIN livraria_devsaber.produtos AS livro
-    ON venda.livro_id = livro.livro_id
-GROUP BY livro.titulo, livro.autor
-ORDER BY total_unidades_vendidas DESC;
-```
-
-**Resultado:**
-| titulo | autor | total_unidades_vendidas |
-|---|---|---|
-| 1984 | George Orwell | 6 |
-| O Guia do Mochileiro das Galáxias | Douglas Adams | 3 |
-| Fundação | Isaac Asimov | 3 |
-| A Cor da Magia | Terry Pratchett | 2 |
-| Neuromancer | William Gibson | 2 |
+![Livros Mais Vendidos](./querys/livros_mais_vendidos.png)
 
 ---
 
 ### 3. Clientes que Mais Gastaram
 Identifica os clientes com maior volume de compras.
 
-```sql
-SELECT c.nome_cliente,
-    SUM(venda.valor_total) AS total_gasto
-FROM livraria_devsaber.vendas AS venda
-JOIN livraria_devsaber.clientes AS c
-    ON venda.cliente_id = c.cliente_id
-GROUP BY c.nome_cliente
-ORDER BY total_gasto DESC;
-```
-
-**Resultado:**
-| nome_cliente | total_gasto |
-|---|---|
-| Bruno Costa | 122.08 |
-| Fernanda Torres | 120.00 |
-| Igor Fernandes | 119.96 |
-| Ana Silva | 100.50 |
-| Gabriel Martins | 91.00 |
+![Clientes que Mais Gastaram](./querys/gastos_cliente.png)
 
 ---
 
 ### 4. Detalhes Completos das Vendas
 Combina todas as tabelas para exibir uma visão completa de cada transação.
 
-```sql
-SELECT vend.nome_vendedor, c.nome_cliente, li.titulo,
-    li.valor_unitario, venda.valor_total,
-    venda.quantidade, venda.data_venda
-FROM livraria_devsaber.vendas AS venda
-JOIN livraria_devsaber.produtos AS li ON venda.livro_id = li.livro_id
-JOIN livraria_devsaber.clientes AS c ON venda.cliente_id = c.cliente_id
-JOIN livraria_devsaber.vendedores AS vend ON venda.vendedor_id = vend.vendedor_id
-ORDER BY venda.data_venda DESC;
-```
+![Detalhes Completos das Vendas](./querys/detalhes_vendas.png)
 
 ---
 
@@ -186,7 +133,7 @@ JOIN livraria_devsaber.produtos AS li ON venda.livro_id = li.livro_id
 JOIN livraria_devsaber.clientes AS c ON venda.cliente_id = c.cliente_id
 JOIN livraria_devsaber.vendedores AS vend ON venda.vendedor_id = vend.vendedor_id;
 
--- Utilizando a View:
+-- View:
 SELECT * FROM livraria_devsaber.vw_detalhes_vendas;
 ```
 
@@ -198,14 +145,12 @@ SELECT * FROM livraria_devsaber.vw_detalhes_vendas;
 2. Execute os scripts na seguinte ordem:
 
 ```bash
-# 1. Cria o banco e as tabelas
-mysql -u seu_usuario -p < setup_database.sql
+Com o **MySQL Workbench** aberto, execute os arquivos nessa ordem:
+ 
+1. `setup_database.sql` — cria o banco e as tabelas
+2. `seed_data.sql` — insere os dados de exemplo
+3. `queries_and_views.sql` — roda as consultas e cria a View
 
-# 2. Popula com os dados de exemplo
-mysql -u seu_usuario -p < seed_data.sql
-
-# 3. Executa as consultas e cria as views
-mysql -u seu_usuario -p < queries_and_views.sql
 ```
 
 > 💡 Você também pode executar cada arquivo manualmente pelo **MySQL Workbench** ou qualquer outro cliente SQL de sua preferência.
@@ -213,7 +158,7 @@ mysql -u seu_usuario -p < queries_and_views.sql
 ---
 
 ## 🛠️ Tecnologias Utilizadas
-
+ 
 | Tecnologia | Uso |
 |---|---|
 | Google BigQuery | Desenvolvimento original do projeto |
@@ -239,8 +184,8 @@ O **Programa Desenvolve** é uma iniciativa do **Grupo Boticário** em parceria 
 
 **Carlos Diego Barbosa do Nascimento**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/seu-perfil)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/seu-usuario)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/carlosdiego-nascimento/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/carlosd-nascimento)
 
 ---
 
