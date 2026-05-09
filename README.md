@@ -9,9 +9,9 @@
 Este projeto foi criado como parte da **Jornada de Especialização em Engenharia de Dados** (160h), dentro do Programa Desenvolve. O objetivo era aplicar na prática os fundamentos de SQL e modelagem de dados, simulando o banco de dados de uma livraria fictícia chamada **DevSaber**.
 O projeto original foi desenvolvido em equipe utilizando o **Google BigQuery**. 
 
-```
-OBS.:Após o encerramento do programa e a perda de acesso ao ambiente dos projetos, eu fiz o refatoramento e migração para MySQL.
-```
+
+> OBS.: Após o encerramento do programa e a perda de acesso ao ambiente dos projetos, eu fiz o refatoramento e migração para MySQL.
+
 
 ### 🏅 Certificações obtidas no programa
 
